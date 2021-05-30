@@ -1,0 +1,56 @@
+syntax = "proto3";
+package moduleplugin.v1beta1;
+
+import "google/protobuf/any.proto";
+import "cosmos/base/abci/v1beta1/abci.proto";
+import "tendermint/types/types.proto";
+import "tendermint/types/params.proto";
+import "tendermint/abci/types.proto";
+
+option go_package = "github.com/mconcat/module-plugin/types";
+
+
+
+message Context {
+  tendermint.types.Header header = 1;
+  string chain_id = 2;
+  bytes tx_bytes = 3;
+  repeated tendermint.abci.VoteInfo vote_infos = 4;
+  bool check_tx = 5;
+  bool recheck_tx = 6;
+  tendermint.types.ConsensusParams consensus_params = 7;
+}
+
+message RequestHandle {
+  google.protobuf.Any msg = 1;
+  Context context = 2;
+}
+
+message ResponseHandle {
+  cosmos.base.abci.v1beta1.Result result = 1;
+}
+
+service Module {
+  rpc Handle(RequestHandle) returns (ResponseHandle);
+}
+
+message RequestGet {
+  bytes key = 1;
+}
+
+message ResponseGet {
+  bytes value = 1;
+}
+
+message RequestSet {
+  bytes key = 1;
+  bytes value = 2;
+}
+
+message ResponseSet {
+}
+
+service State {
+  rpc Get(RequestGet) returns (ResponseGet);
+  rpc Set(RequestSet) returns (ResponseSet);
+}
